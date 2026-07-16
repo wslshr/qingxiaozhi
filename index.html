@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>青小智 - 青岛工程职业学院 AI 答疑助手</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', -apple-system, sans-serif;
+            background-color: #f5f7fa;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+            color: white;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
+
+        .header-logo {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .header-info h1 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .header-info p {
+            font-size: 12px;
+            opacity: 0.85;
+        }
+
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f5f7fa;
+        }
+
+        .chat-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat-container::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 3px;
+        }
+
+        .welcome-section {
+            text-align: center;
+            padding: 40px 20px;
+            margin-bottom: 20px;
+        }
+
+        .welcome-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            color: white;
+        }
+
+        .welcome-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1a365d;
+            margin-bottom: 8px;
+        }
+
+        .welcome-desc {
+            font-size: 14px;
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        .suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 24px;
+        }
+
+        .suggestion-btn {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 20px;
+            padding: 10px 20px;
+            font-size: 13px;
+            color: #4b5563;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .suggestion-btn:hover {
+            background: #eff6ff;
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+
+        .promo-section {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            padding: 20px;
+            margin: 0 0 20px;
+            flex-wrap: wrap;
+        }
+
+        .promo-card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            text-align: center;
+            max-width: 200px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+        }
+
+        .promo-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+
+        .promo-card img {
+            width: 160px;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .promo-card .promo-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a365d;
+            margin-bottom: 4px;
+            line-height: 1.4;
+        }
+
+        .promo-card .promo-desc {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .qr-image {
+            width: 160px;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .qr-placeholder {
+            width: 160px;
+            height: 160px;
+            border-radius: 12px;
+            margin: 0 auto 12px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .qr-placeholder.green {
+            background: #e7f5e9;
+        }
+
+        .qr-placeholder.orange {
+            background: #fff3e0;
+        }
+
+        .qr-pattern {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0.3;
+            background-image: 
+                linear-gradient(45deg, rgba(0,0,0,0.1) 25%, transparent 25%),
+                linear-gradient(-45deg, rgba(0,0,0,0.1) 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, rgba(0,0,0,0.1) 75%),
+                linear-gradient(-45deg, transparent 75%, rgba(0,0,0,0.1) 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+
+        .qr-center {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .qr-placeholder.green .qr-center {
+            background: #07c160;
+        }
+
+        .qr-placeholder.orange .qr-center {
+            background: #ff9500;
+        }
+
+        .qr-icon {
+            font-size: 24px;
+            color: white;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .message-user .message-avatar {
+            background: #3b82f6;
+            color: white;
+            margin-left: auto;
+        }
+
+        .message-bot .message-avatar {
+            background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+            color: white;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .message-user .message-content {
+            background: #3b82f6;
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message-bot .message-content {
+            background: white;
+            color: #374151;
+            border: 1px solid #e5e7eb;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-bot .message-content ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .message-bot .message-content li {
+            margin: 6px 0;
+        }
+
+        .message-image-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .message-image {
+            max-width: 280px;
+            max-height: 300px;
+            border-radius: 12px;
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .message-image:hover {
+            transform: scale(1.02);
+        }
+
+        .message-image-caption {
+            font-size: 13px;
+            color: #6b7280;
+            text-align: left;
+            line-height: 1.5;
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 12px 16px;
+            background: white;
+            border-radius: 16px;
+            border-bottom-left-radius: 4px;
+            border: 1px solid #e5e7eb;
+            width: fit-content;
+        }
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background: #9ca3af;
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: 0s; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        .input-area {
+            background: white;
+            padding: 12px 20px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 24px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .input-wrapper input:focus {
+            border-color: #3b82f6;
+        }
+
+        .input-wrapper input::placeholder {
+            color: #9ca3af;
+        }
+
+        .send-btn {
+            width: 44px;
+            height: 44px;
+            background: #3b82f6;
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s ease;
+        }
+
+        .send-btn:hover {
+            background: #2563eb;
+        }
+
+        .send-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 8px;
+            font-size: 12px;
+            color: #9ca3af;
+            background: white;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 768px) {
+            .message-content {
+                max-width: 85%;
+            }
+
+            .header-info h1 {
+                font-size: 16px;
+            }
+
+            .header-info p {
+                font-size: 11px;
+            }
+
+            .suggestion-btn {
+                padding: 8px 16px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-logo">🎓</div>
+        <div class="header-info">
+            <h1>青小智</h1>
+            <p>青岛工程职业学院 AI 智能答疑助手</p>
+        </div>
+    </div>
+
+    <div class="chat-container" id="chatContainer">
+        <div class="welcome-section">
+            <div class="welcome-avatar">🎓</div>
+            <div class="welcome-title">你好，我是青小智</div>
+            <div class="welcome-desc">青岛工程职业学院 AI 智能答疑助手<br>有任何学业问题，都可以问我</div>
+
+            <div class="promo-section">
+                <div class="promo-card">
+                    <img src="7a8b4c14d3ad817e31edda228489aca1.jpg" alt="询问学长" class="qr-image">
+                    <div class="promo-title">询问学长在学校问题的同学加</div>
+                    <div class="promo-desc">扫描二维码添加学长微信</div>
+                </div>
+                <div class="promo-card">
+                    <img src="bda4977d5528e3062c35045f98173b41.jpg" alt="兼职赚钱" class="qr-image">
+                    <div class="promo-title">想在校赚钱的同学加</div>
+                    <div class="promo-desc">扫描二维码获取兼职信息</div>
+                </div>
+            </div>
+
+            <div class="suggestions">
+                <button class="suggestion-btn" onclick="sendMessage('军训多长时间？')">军训多长时间？</button>
+                <button class="suggestion-btn" onclick="sendMessage('宿舍费用是多少？')">宿舍费用是多少？</button>
+                <button class="suggestion-btn" onclick="sendMessage('需要带哪些物品？')">需要带哪些物品？</button>
+                <button class="suggestion-btn" onclick="sendMessage('食堂怎么消费？')">食堂怎么消费？</button>
+                <button class="suggestion-btn" onclick="sendMessage('可以转专业吗？')">可以转专业吗？</button>
+                <button class="suggestion-btn" onclick="sendMessage('图书馆开放时间？')">图书馆开放时间？</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="input-area">
+        <div class="input-wrapper">
+            <input type="text" id="inputField" placeholder="输入你的问题..." onkeydown="handleKeyDown(event)">
+        </div>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+    </div>
+
+    <div class="footer">
+        AI 回答仅供参考，重要问题请咨询相关老师
+    </div>
+
+    <script>
+        const imageKnowledgeBase = {
+            dormitory: {
+                keywords: ['宿舍环境', '宿舍', '寝室', '住宿', '住的地方'],
+                image: '9635e24ee15f182c831903a21e0d9def.jpg',
+                description: '这是我们学校的六人间宿舍，配备两个独立卫生间、空调和储物柜，环境整洁明亮。'
+            },
+            laundry: {
+                keywords: ['洗衣房', '洗衣', '洗衣机', '洗衣服', '干洗'],
+                image: '70e25281fcba6157777a6ad3102b54d4.jpg',
+                description: '这是学校的洗衣房，位于宿舍一楼，配备多台洗衣机和烘干机，扫码即可使用，方便快捷。'
+            },
+            gym: {
+                keywords: ['体育馆', '体育', '运动', '篮球', '健身'],
+                image: 'ecc30712665687aaa64d7d40db93ceba.jpg',
+                description: '这是学校的体育馆，设施非常齐全！里面有羽毛球场、篮球场、排球场，还有健身房、游泳馆、台球厅和咖啡馆，满足同学们多样化的运动和休闲需求。'
+            },
+            library: {
+                keywords: ['图书馆', '看书', '学习', '自习', '图书'],
+                image: 'b9a01ee408a6640bd3893283df25d822.jpg',
+                description: '这是学校的图书馆，藏书丰富，设有自习区和研讨室，环境安静，是学习的好地方。'
+            },
+            gate: {
+                keywords: ['学校大门', '校门', '学校门口', '入口', '大门'],
+                image: '41fe47db58b608813f10cc10b89151e2.jpg',
+                description: '这是学校的主大门，宏伟气派，欢迎来到青岛工程职业学院！'
+            },
+            environment: {
+                keywords: ['学校环境', '校园环境', '学校风景', '校园风景', '学校景色'],
+                images: ['66ba123a68d5110d4004538b127c67e1.jpg', '276ac7d71edad72733481ea3ba7f2110.jpg', '8d00523ba98c498afacf28567170609a.jpg'],
+                description: '这是学校的美丽环境，风景优美，设施完善！'
+            }
+        };
+
+        const knowledgeBase = {
+            military: {
+                keywords: ['军训', '训练', '军服', '内务', '被褥', '鞋垫'],
+                responses: {
+                    default: '军训为期两周，具体起止日期以当年学院官方发布的新生通知为准。全体入学新生都需参加军训。军训服装由学院统一采购配发，无强制统一铺盖、被褥及内务标准要求，建议自备舒适鞋垫、毛巾/擦汗巾和防晒用品。',
+                    duration: '军训为期两周，具体起止日期以当年学院官方发布的新生通知为准。',
+                    object: '全体入学新生都需参加军训。',
+                    uniform: '军训服装由学院统一采购配发。',
+                    bedding: '军训期间无强制统一铺盖、被褥及内务标准要求，床上用品可自行准备，也可到校后按需购置。',
+                    items: '建议自备舒适鞋垫、毛巾/擦汗巾、防晒用品。'
+                }
+            },
+            registration: {
+                keywords: ['报到', '开学', '接站', '自驾', '流程', '必备', '物品', '证件', '材料'],
+                responses: {
+                    default: '报到时间和地点以学院官方发布的新生入学通知为准。乘坐公共交通的新生可凭录取通知书乘坐学院安排的接站车辆；自驾建议提前规划路线并错峰入校。报到流程：提前完成学费缴纳，现场签到后领取校园卡，由学长学姐引导入住宿舍。必备物品包括：录取通知书、身份证及复印件、学籍档案、团员证/党员组织关系材料、床上用品、洗漱用品、插排、学习用品和常用药品等。',
+                    time: '报到时段以学院官方发布的新生入学通知为准。',
+                    pickup: '乘坐公共交通报到的新生，可凭录取通知书乘坐学院安排的新生接站车辆。',
+                    selfdrive: '建议提前规划出行路线，按照学院公布的错峰报到时段入校。',
+                    process: '提前查阅新生入学指南，完成学费缴纳等前置手续；报到现场完成签到后，领取校园卡，由学长学姐引导入住宿舍；报到后可按需采购日常用品。',
+                    documents: '证件类：录取通知书、身份证及复印件、学籍档案、团员证/党员组织关系材料。',
+                    items: '必备物品包括：证件类（录取通知书、身份证及复印件、学籍档案、团员证等）、宿舍用品（床上用品、拖鞋、洗漱用品等）、电子用品（插排、充电器、充电宝）、学习用品（笔、笔记本、书包、台灯）、医药用品（口罩、体温计、常用药品）。'
+                }
+            },
+            dormitory: {
+                keywords: ['宿舍', '住宿', '费用', '选房', '床位', '空调', '电费', '卫生间', '门禁', '查寝', '断电', '违禁', '装饰', '快递', '淋浴'],
+                responses: {
+                    default: '宿舍为6人间，住宿费1166元/学年，配备双独立卫生间、双洗漱台、空调，每人配有专属储物柜。可通过「今日校园」APP在线选宿舍与床位，单数房间向阳，双数房间背阴。每晚22:00门禁，22:30走廊熄灯，建议23:00前就寝。禁止使用大功率电器和饲养宠物。',
+                    cost: '住宿费1166元/学年。',
+                    type: '统一为6人间，配备双独立卫生间、双洗漱台、1台空调、基础清洁工具、公共长晾衣杆，每人配有1个专属储物柜。',
+                    size: '床铺尺寸：宽0.9米、长1.9米。',
+                    aircon: '有空调，自主交电费，每个月有15块钱的补贴。',
+                    electricity: '学校赠送新生首年基础电量，超出部分需自行线上缴费，执行民用电价。',
+                    selection: '新生收到录取通知书后，可通过「今日校园」APP在线自主选择宿舍与床位；选房系统会在全部新生录取工作结束后正式开放；床位标注有清晰的上下铺编号，点击即可选定。',
+                    direction: '单数房间向阳，双数房间背阴。',
+                    access: '每晚22:00宿舍门禁，22:30走廊公共区域熄灯，宿舍室内灯可自行控制，建议23:00前就寝。',
+                    inspection: '由学生自律组织负责日常查寝，核查在寝人数、排查抽烟饮酒、晚归等违规行为；学校不定期抽查宿舍卫生与安全情况。',
+                    poweroff: '宿舍夜间不执行统一断电，插座持续供电；使用违规大功率电器会触发电路保护机制，强制断电数分钟；电脑等常规小功率电器可正常使用。',
+                    forbidden: '严禁携带大功率电器、易燃易爆品进入宿舍；锅具、热得快、烧水壶等违规电器禁止使用。',
+                    decoration: '禁止私自墙面涂鸦、粘贴墙纸、安装挂钩、悬挂床帘。',
+                    address: '快递地址：山东省青岛市城阳区上马街道青岛工程职业学院生活服务楼菜鸟驿站；生活服务楼可办理快递寄收。',
+                    shower: '宿舍冷水免费，淋浴为扫码付费使用；建议23:00前完成洗漱，避免影响他人休息。'
+                }
+            },
+            dining: {
+                keywords: ['食堂', '吃饭', '餐饮', '消费', '支付', '价格', '错峰', '超市'],
+                responses: {
+                    default: '校园餐饮分为宜周mall（美食街业态）和主餐厅（上下两层连通）。正餐人均约12元，支持校园卡、微信/支付宝扫码支付，也可通过「易校园」APP付款。中午实行错峰就餐制度。校内设有平价超市与连锁便利店。',
+                    location: '校园餐饮分为两大区域——宜周mall（美食街业态）、主餐厅（上下两层连通）。',
+                    price: '正餐人均约12元，价位亲民，可按需选择。',
+                    payment: '支持校园卡、微信/支付宝扫码支付，也可通过「易校园」APP付款。',
+                    peak: '中午实行错峰就餐制度，分批次有序用餐，缓解排队压力。',
+                    supermarket: '校内设有平价超市与连锁便利店，物价与校外市面持平，可满足日常需求。'
+                }
+            },
+            study: {
+                keywords: ['教学', '学习', '教学楼', '自习室', '图书馆', '教室', '证书', '自习'],
+                responses: {
+                    default: '宿舍步行至教学楼约7分钟。教学楼阶梯教室开放为自习室，工作日16:00-21:30，周末8:30-21:00。博观图书馆工作日8:30-11:30、13:30-21:00开放，周末正常开放。可考取的证书包括专业类（技工证、钳工证等）和通用类（英语四六级、计算机等级证书等）。无强制早晚自习要求。',
+                    distance: '宿舍步行至教学楼约7分钟。',
+                    classroom: '所有教室均配备中央空调，每间教室设有两个控制面板。每晚21:30教学楼统一锁门。',
+                    studyroom: '教学楼阶梯教室开放为自习室，工作日开放时间16:00-21:30；周末开放时间8:30-21:00。',
+                    library: '博观图书馆常规开放时间：工作日8:30-11:30、13:30-21:00；周末正常开放，法定节假日、寒暑假闭馆，具体以当年校历通知为准。',
+                    certificate: '专业类：技工证、钳工证、焊工证、铣工证、1+X职业技能等级证书等；通用类：英语四六级、小语种等级证书、普通话证书、计算机等级证书、会计证书等，可根据自身需求备考。',
+                    selfstudy: '无强制早晚自习要求。无课程安排的时段，均为学生自由支配时间。'
+                }
+            },
+            transfer: {
+                keywords: ['转专业', '专升本', '升学', '考试', '报考'],
+                responses: {
+                    default: '校内转专业：普通全日制专科夏季高考普通批一年级学生，当年高考分数高于申请转入专业的当年录取分数线，可申请转专业；单独招生、春季高考、校企合作计划类学生不可申请。专升本考试在大三下学期举行，由山东省教育招生考试院统一命题。校内合作机构为文硕教育。',
+                    changeMajor: '普通全日制专科夏季高考普通批一年级学生，当年高考分数高于申请转入专业的当年录取分数线，可向所在二级学院提交转专业申请，经学院党委会审议决定。单独招生、春季高考、校企合作计划类学生不可申请转专业。',
+                    upgrade: '专升本报考按专业大类划分，除产品艺术设计专业外，智能制造学院所属专业均属于机械制造大类，升本对应报考同类专业。全日制专升本考试在大三下学期举行，由山东省教育招生考试院统一命题。',
+                    institution: '校内专升本合作机构为文硕教育，设有办公点位，新生可到校后实地咨询。',
+                    advice: '建议入校后充分了解再决定是否报班；自律性较强的同学可自主备考；最新政策以山东省教育招生考试院官方发布为准。'
+                }
+            },
+            safety: {
+                keywords: ['出入', '校门', '请假', '出校', '夜不归宿', '晚归', '安全'],
+                responses: {
+                    default: '工作日出校需通过企业微信提交请假申请，辅导员审批通过后将假条交由门卫查验；工作日最后一天15:30之后可自由出校。非工作日无硬性出校时间限制，但需按时返校。夜不归宿需提前向辅导员请假。校外兼职需提高警惕，谨防网络诈骗。',
+                    weekday: '工作日出校需通过企业微信提交出校请假申请，辅导员审批通过后，将假条交由门卫查验即可出校；工作日最后一天15:30之后，可自由出校，无需提交请假申请。',
+                    weekend: '非工作日出校无硬性出校时间限制，但需在学校规定的晚间返校时间前回到校园。',
+                    overnight: '如需夜不归宿，需提前向辅导员提交请假申请，说明具体原因与行程。',
+                    late: '未按规定时间返校，可能会被限制入校。',
+                    warning: '校外兼职需提高警惕，谨防网络诈骗，遇疑问及时咨询家长或辅导员。'
+                }
+            },
+            facilities: {
+                keywords: ['设施', '服务', '医务室', '体育馆', 'WiFi', '监控', '社团', '兼职'],
+                responses: {
+                    default: '校内设施包括医务室（综合服务楼二楼）、体育馆（收费）、室外篮球场（免费）、校园WiFi（需到营业厅办理）、监控覆盖全域。每年10月举办百团大战招新。食堂、校园商铺设有学生兼职岗位。',
+                    clinic: '医务室位于综合服务楼二楼，乘电梯左转即可到达。',
+                    gym: '体育馆、台球厅、游泳馆为收费运营项目，由第三方机构管理；室外篮球场、足球场、网球场为免费开放区域。',
+                    wifi: '校园WiFi覆盖教室、宿舍、食堂三大核心区域，需到综合服务楼二楼营业厅办理开通。',
+                    monitor: '校园全域覆盖监控，如遇物品丢失，需通过辅导员提交查看申请，经审批后由校方工作人员调取查看。',
+                    club: '每年10月举办百团大战招新，社团任期1年；中途退社无社团学分，需按规定流程办理退社手续。',
+                    parttime: '食堂、校园商铺提供学生兼职岗位，学校设有官方勤工助学岗位；建议校外兼职优先选择与专业方向匹配的岗位，注意防范诈骗风险。'
+                }
+            },
+            curriculum: {
+                keywords: ['课程表', '选课', '课表', '课程', '预选', '正选', '补退选'],
+                responses: {
+                    default: '课程表查看：主要通过学校教务管理系统（网页端或校园官方APP，如智慧校园、今日校园等），登录后在「我的课表」「教学安排」板块即可查看；也可通过班级群、学院教务办公室获取本班统一课表。选课流程：每学期学校会公布固定选课周期（通常分预选、正选、补退选三个阶段），登录教务系统进入「选课中心」，按照专业培养方案要求，选择对应必修课、专业选修课、公共选修课即可。建议提前看好选课开放时间，热门课程需在开放后尽快选择。',
+                    schedule: '课程表查看：主要通过学校教务管理系统（网页端或校园官方APP，如智慧校园、今日校园等），登录后在「我的课表」「教学安排」板块即可查看；也可通过班级群、学院教务办公室获取本班统一课表。',
+                    select: '选课流程：每学期学校会公布固定选课周期（通常分预选、正选、补退选三个阶段），登录教务系统进入「选课中心」，按照专业培养方案要求，选择对应必修课、专业选修课、公共选修课即可。建议提前看好选课开放时间，热门课程需在开放后尽快选择。'
+                }
+            },
+            credits: {
+                keywords: ['学分', '修读', '毕业学分', '总学分'],
+                responses: {
+                    default: '没有统一的固定数值，核心以本专业的人才培养方案为准：本科专业每学期常规修读学分为20-30学分左右，专科专业一般为15-25学分左右。毕业需修满总学分（本科通常140-170学分，专科通常100-140学分），且必修课、选修课、实践实习等各模块均需达到最低学分要求。建议每学期按培养方案的进度修读，避免学分不足延迟毕业，或超学分产生额外费用。',
+                    amount: '本科专业每学期常规修读学分为20-30学分左右，专科专业一般为15-25学分左右。',
+                    graduation: '毕业需修满总学分（本科通常140-170学分，专科通常100-140学分），且必修课、选修课、实践实习等各模块均需达到最低学分要求。'
+                }
+            },
+            exam: {
+                keywords: ['挂科', '补考', '重修', '考试', '清考', '绩点'],
+                responses: {
+                    default: '挂科处理：补考——大部分学校会在新学期开学后1-2周内安排挂科课程的补考，补考通过后成绩记为及格，可正常获得对应学分。重修——若补考未通过，需跟随下一届同课程的班级重修上课并参加考试；多数高校已取消毕业前"清考"，挂科只能通过重修通过。注意：挂科会影响绩点、奖学金与保研资格，挂科学分累计达到学校红线还会触发学业预警、留级等处理，具体规则以学校学籍管理规定为准。',
+                    makeups: '大部分学校会在新学期开学后1-2周内安排挂科课程的补考，补考通过后成绩记为及格，可正常获得对应学分。',
+                    retake: '若补考未通过，需跟随下一届同课程的班级重修上课并参加考试；多数高校已取消毕业前"清考"，挂科只能通过重修通过。'
+                }
+            },
+            studentcard: {
+                keywords: ['学生证', '办理', '挂失', '补办', '磁条'],
+                responses: {
+                    default: '新生入学后，学校会统一采集信息、批量办理学生证，由学院统一发放，同步办理火车票优惠磁条。挂失补办：一般在校务服务大厅（学生处/教务处窗口）提交申请，或通过校园APP线上办理，提交证件照、缴纳工本费后，通常3-7个工作日可取，磁条充磁也可同步办理。',
+                    apply: '新生入学后，学校会统一采集信息、批量办理学生证，由学院统一发放，同步办理火车票优惠磁条。',
+                    lost: '挂失补办：一般在校务服务大厅（学生处/教务处窗口）提交申请，或通过校园APP线上办理，提交证件照、缴纳工本费后，通常3-7个工作日可取，磁条充磁也可同步办理。'
+                }
+            },
+            cardrecharge: {
+                keywords: ['校园卡', '充值', '圈存', 'NFC', '支付宝', '微信'],
+                responses: {
+                    default: '线上充值：通过学校官方校园APP、支付宝/微信的「校园卡」服务（搜索对应学校名称，绑定个人校园卡后充值）、学校企业微信均可完成。线下充值：校园内的自助圈存机（刷银行卡转账充值）、食堂/校园超市的人工充值窗口、校务大厅服务点都可办理。部分支持NFC功能的手机，可直接贴近校园卡完成空中充值。',
+                    online: '线上充值：通过学校官方校园APP、支付宝/微信的「校园卡」服务（搜索对应学校名称，绑定个人校园卡后充值）、学校企业微信均可完成。',
+                    offline: '线下充值：校园内的自助圈存机（刷银行卡转账充值）、食堂/校园超市的人工充值窗口、校务大厅服务点都可办理。'
+                }
+            },
+            counseling: {
+                keywords: ['心理咨询', '心理', '心理健康', '心理辅导', '心理测评'],
+                responses: {
+                    default: '校内一般设有心理健康教育中心（心理咨询中心），地址多位于学生活动中心、校医院旁或独立的心理服务楼，服务全程免费且严格保密。预约方式：可通过校园官网/APP线上预约、拨打中心预约电话、直接到现场登记预约。服务内容：包含个体心理咨询、团体心理辅导、心理测评、危机干预等，多数学校还设有24小时心理援助热线。',
+                    location: '校内一般设有心理健康教育中心（心理咨询中心），地址多位于学生活动中心、校医院旁或独立的心理服务楼，服务全程免费且严格保密。',
+                    appointment: '预约方式：可通过校园官网/APP线上预约、拨打中心预约电话、直接到现场登记预约。'
+                }
+            },
+            scholarship: {
+                keywords: ['奖学金', '申请', '国家奖学金', '励志奖学金', '学业奖学金'],
+                responses: {
+                    default: '申请时间：一般每学年秋季学期（9-11月），评定上一学年的奖学金。基本流程：学校/学院发布奖学金评定通知，明确申请条件（通常要求无挂科、绩点/综测排名达标等）；符合条件的学生通过学工系统线上提交申请，或线下提交申请表与佐证材料；经班级评议、学院审核、学校公示无异议后，统一发放奖金。常见类型：国家奖学金、国家励志奖学金、校级学业奖学金、各类企业/社会奖学金等，不同奖项申请条件与金额不同。',
+                    time: '申请时间：一般每学年秋季学期（9-11月），评定上一学年的奖学金。',
+                    types: '常见类型：国家奖学金、国家励志奖学金、校级学业奖学金、各类企业/社会奖学金等，不同奖项申请条件与金额不同。'
+                }
+            },
+            grant: {
+                keywords: ['助学金', '申请', '困难认定', '家庭经济困难'],
+                responses: {
+                    default: '助学金面向家庭经济困难学生，按学年申请、按学期发放：先完成家庭经济困难学生认定：提交《家庭经济困难学生认定申请表》，按学校要求提供相关佐证材料；认定通过后，在规定时间内通过学工系统申请对应等级的国家助学金（一般分2-3档）；经学院审核、公示无异议后发放。低保家庭、特困供养、脱贫家庭等学生可优先纳入认定范围，具体要求以学校学生资助管理中心通知为准。',
+                    process: '先完成家庭经济困难学生认定：提交《家庭经济困难学生认定申请表》，按学校要求提供相关佐证材料；认定通过后，在规定时间内通过学工系统申请对应等级的国家助学金（一般分2-3档）；经学院审核、公示无异议后发放。',
+                    priority: '低保家庭、特困供养、脱贫家庭等学生可优先纳入认定范围，具体要求以学校学生资助管理中心通知为准。'
+                }
+            },
+            loan: {
+                keywords: ['助学贷款', '生源地', '校园地', '贷款额度'],
+                responses: {
+                    default: '主流为生源地信用助学贷款，也可选择校园地助学贷款：生源地贷款——暑假期间，在户籍所在地的教育局学生资助管理中心办理。首次贷款需学生与共同借款人一同到场，携带身份证、户口本、录取通知书/学生证、贷款申请表；后续学年可在线上完成续贷。校园地贷款——入学后向学校学生资助管理中心提交申请，按要求准备材料即可。本专科生每年贷款额度最高不超过16000元，在校期间利息由财政全额补贴，毕业离校后开始计收利息。',
+                    local: '生源地贷款：暑假期间，在户籍所在地的教育局学生资助管理中心办理。首次贷款需学生与共同借款人一同到场，携带身份证、户口本、录取通知书/学生证、贷款申请表；后续学年可在线上完成续贷。',
+                    campus: '校园地贷款：入学后向学校学生资助管理中心提交申请，按要求准备材料即可。'
+                }
+            },
+            hukou: {
+                keywords: ['户口迁移', '户籍', '集体户口', '落户'],
+                responses: {
+                    default: '户口迁移为自愿办理，不做强制要求：若选择迁移，新生凭录取通知书到户籍地派出所开具户口迁移证，入学报到时统一交给学校保卫处，落户为学校集体户口。参考建议：毕业后计划回原籍发展、为农村户口的同学可以不迁；有意向在学校所在城市长期就业落户的同学可以选择迁移，毕业时再按就业情况转出。',
+                    voluntary: '户口迁移为自愿办理，不做强制要求。',
+                    process: '若选择迁移，新生凭录取通知书到户籍地派出所开具户口迁移证，入学报到时统一交给学校保卫处，落户为学校集体户口。'
+                }
+            },
+            archive: {
+                keywords: ['档案', '转接', '学籍档案', '密封', '拆封'],
+                responses: {
+                    default: '新生入学：高中阶段档案由毕业高中统一邮寄至高校招生办/学生处，部分地区允许学生自带密封档案，报到时上交学院；严禁私自拆封档案，否则会失效拒收。毕业生转出：有就业单位且单位接收档案的，转至单位或对应人才市场；升学的转至录取院校；未就业的一般转回户籍所在地公共就业和人才服务机构。档案去向可通过学校档案馆或学工处查询。',
+                    incoming: '新生入学：高中阶段档案由毕业高中统一邮寄至高校招生办/学生处，部分地区允许学生自带密封档案，报到时上交学院；严禁私自拆封档案，否则会失效拒收。',
+                    outgoing: '毕业生转出：有就业单位且单位接收档案的，转至单位或对应人才市场；升学的转至录取院校；未就业的一般转回户籍所在地公共就业和人才服务机构。'
+                }
+            },
+            youthleague: {
+                keywords: ['团组织关系', '智慧团建', '团员证', '介绍信'],
+                responses: {
+                    default: '分为线上系统转接和线下材料交接：线上——通过「智慧团建」系统，由原高中/毕业院校的团支部发起转出，选择对应大学的学院班级团支部，入学后由学校审核接收。线下——携带团员证、团组织关系介绍信，报到时交给学院团委或班级团支书，完成团员证注册盖章。一般需在入学后1-2个月内完成全部转接手续。',
+                    online: '线上：通过「智慧团建」系统，由原高中/毕业院校的团支部发起转出，选择对应大学的学院班级团支部，入学后由学校审核接收。',
+                    offline: '线下：携带团员证、团组织关系介绍信，报到时交给学院团委或班级团支书，完成团员证注册盖章。'
+                }
+            },
+            medical: {
+                keywords: ['医保', '参保', '报销', '城乡居民医保'],
+                responses: {
+                    default: '大学生统一参加学校所在地的城乡居民基本医疗保险：新生入学后，学校会统一组织参保登记、收取保费，集体办理参保手续，保费按学年缴纳。参保后可享受当地居民医保的门诊、住院报销待遇，在校医院就医报销比例通常更高。若已在户籍地参保，可选择停缴户籍地医保、缴纳学校所在地医保，日常就医报销更便捷；医保待遇不重复享受。',
+                    enrollment: '新生入学后，学校会统一组织参保登记、收取保费，集体办理参保手续，保费按学年缴纳。',
+                    benefit: '参保后可享受当地居民医保的门诊、住院报销待遇，在校医院就医报销比例通常更高。'
+                }
+            },
+            leave: {
+                keywords: ['请假', '流程', '审批', '销假', '病假', '事假'],
+                responses: {
+                    default: '按请假时长分级审批，一般流程为：3天以内的短期请假——向辅导员提交线上申请或纸质假条，说明事由，辅导员审批通过即可。3-7天的中期请假——经辅导员签字同意后，报学院学工办公室审批。7天以上的长期请假——需学院分管学生工作的领导审批，部分学校还需同步报教务处备案。病假需附医院开具的诊断证明，事假需说明合理理由；假期结束后需及时销假，无故缺勤按旷课处理。',
+                    short: '3天以内的短期请假：向辅导员提交线上申请或纸质假条，说明事由，辅导员审批通过即可。',
+                    medium: '3-7天的中期请假：经辅导员签字同意后，报学院学工办公室审批。',
+                    long: '7天以上的长期请假：需学院分管学生工作的领导审批，部分学校还需同步报教务处备案。'
+                }
+            },
+            transcript: {
+                keywords: ['成绩单', '打印', '自助打印', '盖章', '中英文'],
+                responses: {
+                    default: '自助打印：校园内的图书馆、教学楼、校务大厅通常设有教务自助打印机，刷校园卡或登录教务账号，即可打印成绩单，部分学校支持打印中英文成绩单，前几份免费。正式盖章版：如需用于求职、保研、留学的官方成绩单，可到教务处或学院教务办公室申请，加盖学校教务公章后生效。教务系统内可查询电子版成绩单，自行打印无公章，仅适合个人使用。',
+                    selfservice: '自助打印：校园内的图书馆、教学楼、校务大厅通常设有教务自助打印机，刷校园卡或登录教务账号，即可打印成绩单，部分学校支持打印中英文成绩单，前几份免费。',
+                    official: '正式盖章版：如需用于求职、保研、留学的官方成绩单，可到教务处或学院教务办公室申请，加盖学校教务公章后生效。'
+                }
+            },
+            activities: {
+                keywords: ['校园活动', '报名', '到梦空间', '第二课堂', '社团'],
+                responses: {
+                    default: '主要有三类报名渠道：第二课堂平台——多数高校使用「到梦空间」等第二课堂系统，校级、院级的讲座、竞赛、志愿活动等都会在此发布，线上报名并打卡记录学分。学院与社团通知——班级群、学院公众号、各学生社团的招新/活动通知，会附带报名二维码或线下报名方式。校级官方渠道——校团委、学生会、教务处的官方公众号/官网，会发布运动会、迎新晚会、学科竞赛等大型校级活动的报名通知。',
+                    platform: '第二课堂平台：多数高校使用「到梦空间」等第二课堂系统，校级、院级的讲座、竞赛、志愿活动等都会在此发布，线上报名并打卡记录学分。',
+                    notice: '学院与社团通知：班级群、学院公众号、各学生社团的招新/活动通知，会附带报名二维码或线下报名方式。'
+                }
+            },
+            app: {
+                keywords: ['APP', '应用', '学习通', '企业微信', '蔚来校园', '易校园', '今日校园'],
+                responses: {
+                    default: '常用APP包括：学习通（课程学习）、企业微信（日常沟通、出校请假）、蔚来校园（公共设备扫码支付）、易校园（食堂消费）、今日校园（选宿舍、校园事务）。',
+                    xuetong: '学习通：用于课程学习、查看课程动态与学习资料。',
+                    wechat: '企业微信：用于日常沟通、出校请假审批。',
+                    weilai: '蔚来校园：用于宿舍洗衣机、吹风机等公共设备扫码支付。',
+                    yixiaoyuan: '易校园：用于食堂消费支付。',
+                    jintian: '今日校园：用于在线选宿舍、校园事务办理。'
+                }
+            }
+        };
+
+        function getResponse(query) {
+            let imageMatch = null;
+            let imageScore = 0;
+
+            for (const [category, data] of Object.entries(imageKnowledgeBase)) {
+                for (const keyword of data.keywords) {
+                    if (query.includes(keyword)) {
+                        const score = keyword.length;
+                        if (score > imageScore) {
+                            imageScore = score;
+                            imageMatch = category;
+                        }
+                    }
+                }
+            }
+
+            if (imageMatch) {
+                const data = imageKnowledgeBase[imageMatch];
+                if (data.images && data.images.length > 0) {
+                    const randomImage = data.images[Math.floor(Math.random() * data.images.length)];
+                    return {
+                        type: 'image',
+                        data: { ...data, image: randomImage }
+                    };
+                }
+                return {
+                    type: 'image',
+                    data: data
+                };
+            }
+
+            let bestMatch = null;
+            let bestScore = 0;
+
+            for (const [category, data] of Object.entries(knowledgeBase)) {
+                for (const keyword of data.keywords) {
+                    if (query.includes(keyword)) {
+                        const score = keyword.length;
+                        if (score > bestScore) {
+                            bestScore = score;
+                            bestMatch = category;
+                        }
+                    }
+                }
+            }
+
+            if (bestMatch) {
+                const responses = knowledgeBase[bestMatch].responses;
+                for (const [key, response] of Object.entries(responses)) {
+                    if (key !== 'default' && query.includes(key)) {
+                        return response;
+                    }
+                }
+                return responses.default;
+            }
+
+            return {
+                type: 'image',
+                data: {
+                    image: '7a8b4c14d3ad817e31edda228489aca1.jpg',
+                    description: '抱歉，这个问题我暂时无法回答。您可以扫描上方二维码添加学长微信，学长会为您解答更多问题！'
+                }
+            };
+        }
+
+        function sendMessage(text) {
+            const inputField = document.getElementById('inputField');
+            const messageText = text || inputField.value.trim();
+            
+            if (!messageText) return;
+
+            inputField.value = '';
+            addMessage(messageText, 'user');
+            showTyping();
+
+            setTimeout(() => {
+                removeTyping();
+                const response = getResponse(messageText);
+                if (typeof response === 'object' && response.type === 'image') {
+                    addImageMessage(response.data, 'bot');
+                } else {
+                    addMessage(response, 'bot');
+                }
+            }, 800 + Math.random() * 700);
+        }
+
+        function handleKeyDown(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function addMessage(text, type) {
+            const chatContainer = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message message-${type}`;
+            
+            const avatar = type === 'user' ? '👤' : '🎓';
+            const avatarColor = type === 'user' ? '#3b82f6' : 'linear-gradient(135deg, #1a365d 0%, #2c5282 100%)';
+            
+            messageDiv.innerHTML = `
+                <div class="message-avatar" style="background: ${avatarColor}">${avatar}</div>
+                <div class="message-content">${formatText(text)}</div>
+            `;
+            
+            chatContainer.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        function addImageMessage(data, type) {
+            const chatContainer = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message message-${type}`;
+            
+            const avatar = type === 'user' ? '👤' : '🎓';
+            const avatarColor = type === 'user' ? '#3b82f6' : 'linear-gradient(135deg, #1a365d 0%, #2c5282 100%)';
+            
+            messageDiv.innerHTML = `
+                <div class="message-avatar" style="background: ${avatarColor}">${avatar}</div>
+                <div class="message-content">
+                    <div class="message-image-container">
+                        <img src="${data.image}" alt="${data.description}" class="message-image">
+                        <div class="message-image-caption">${data.description}</div>
+                    </div>
+                </div>
+            `;
+            
+            chatContainer.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        function formatText(text) {
+            return text;
+        }
+
+        function showTyping() {
+            const chatContainer = document.getElementById('chatContainer');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message message-bot';
+            typingDiv.id = 'typingIndicator';
+            typingDiv.innerHTML = `
+                <div class="message-avatar" style="background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%)">🎓</div>
+                <div class="typing-indicator">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            `;
+            chatContainer.appendChild(typingDiv);
+            scrollToBottom();
+        }
+
+        function removeTyping() {
+            const typingIndicator = document.getElementById('typingIndicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+
+        function scrollToBottom() {
+            const chatContainer = document.getElementById('chatContainer');
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+    </script>
+</body>
+</html>

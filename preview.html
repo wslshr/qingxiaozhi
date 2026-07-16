@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片确认页面</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Microsoft YaHei', sans-serif; background: #f5f7fa; padding: 20px; }
+        h1 { text-align: center; margin-bottom: 30px; color: #1a365d; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
+        .card { background: white; border-radius: 12px; padding: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center; }
+        .card img { width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; }
+        .card .filename { font-size: 12px; color: #6b7280; word-break: break-all; }
+        .card .index { font-size: 14px; font-weight: 600; color: #3b82f6; margin-bottom: 4px; }
+        .note { text-align: center; margin-top: 30px; color: #6b7280; font-size: 14px; }
+        .note strong { color: #ef4444; }
+    </style>
+</head>
+<body>
+    <h1>请确认图片对应关系</h1>
+    <div class="grid">
+        <div class="card"><div class="index">图片1</div><img src="9635e24ee15f182c831903a21e0d9def.jpg"><div class="filename">9635e24ee15f182c831903a21e0d9def.jpg</div></div>
+        <div class="card"><div class="index">图片2</div><img src="70e25281fcba6157777a6ad3102b54d4.jpg"><div class="filename">70e25281fcba6157777a6ad3102b54d4.jpg</div></div>
+        <div class="card"><div class="index">图片3</div><img src="ecc30712665687aaa64d7d40db93ceba.jpg"><div class="filename">ecc30712665687aaa64d7d40db93ceba.jpg</div></div>
+        <div class="card"><div class="index">图片4</div><img src="b9a01ee408a6640bd3893283df25d822.jpg"><div class="filename">b9a01ee408a6640bd3893283df25d822.jpg</div></div>
+        <div class="card"><div class="index">图片5</div><img src="41fe47db58b608813f10cc10b89151e2.jpg"><div class="filename">41fe47db58b608813f10cc10b89151e2.jpg</div></div>
+        <div class="card"><div class="index">图片6</div><img src="66ba123a68d5110d4004538b127c67e1.jpg"><div class="filename">66ba123a68d5110d4004538b127c67e1.jpg</div></div>
+        <div class="card"><div class="index">图片7</div><img src="276ac7d71edad72733481ea3ba7f2110.jpg"><div class="filename">276ac7d71edad72733481ea3ba7f2110.jpg</div></div>
+        <div class="card"><div class="index">图片8</div><img src="8d00523ba98c498afacf28567170609a.jpg"><div class="filename">8d00523ba98c498afacf28567170609a.jpg</div></div>
+    </div>
+    <div class="note">请告诉我：<strong>宿舍环境、洗衣房、体育馆、图书馆、学校环境</strong> 分别对应哪个图片编号？</div>
+</body>
+</html>
